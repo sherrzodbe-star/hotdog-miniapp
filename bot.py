@@ -51,7 +51,6 @@ MENU = {
 app_web = Flask(__name__)
 
 
-# CORS
 @app_web.after_request
 def add_cors(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -108,7 +107,11 @@ def send_to_telegram(chat_id, text):
         },
         timeout=20
     )
-    def send_receipt_to_telegram(chat_id, receipt):
+
+    r.raise_for_status()
+
+
+def send_receipt_to_telegram(chat_id, receipt):
     if not receipt:
         return
 
@@ -119,7 +122,11 @@ def send_to_telegram(chat_id, text):
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
 
         files = {
-            "photo": ("receipt.jpg", io.BytesIO(image_bytes), "image/jpeg")
+            "photo": (
+                "receipt.jpg",
+                io.BytesIO(image_bytes),
+                "image/jpeg"
+            )
         }
 
         data = {
@@ -139,8 +146,6 @@ def send_to_telegram(chat_id, text):
     except Exception:
         logger.exception("Chekni Telegramga yuborishda xato")
 
-    r.raise_for_status()
-
 
 @app_web.get("/health")
 def health():
@@ -150,7 +155,6 @@ def health():
 @app_web.route("/api/order", methods=["POST", "OPTIONS"])
 def create_order():
 
-    # CORS preflight
     if request.method == "OPTIONS":
         return "", 204
 
@@ -168,6 +172,7 @@ def create_order():
     note = str(data.get("note", "")).strip()
     raw_items = data.get("items", [])
     receipt = data.get("receipt")
+
     if not name or not phone or not isinstance(raw_items, list) or not raw_items:
         return jsonify(
             ok=False,
@@ -240,8 +245,10 @@ def create_order():
 
         try:
             send_to_telegram(chat_id, text)
-if receipt:
-    send_receipt_to_telegram(chat_id, receipt)
+
+            if receipt:
+                send_receipt_to_telegram(chat_id, receipt)
+
         except Exception as e:
             logger.exception("Telegramga yuborishda xato")
             errors.append(str(e))
