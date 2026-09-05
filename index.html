@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>American Hot Dog & Burger</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><div class="brand">🌭 American</div><div class="sub">Hot Dog & Burger</div></div>
+    <button id="cartTop" class="cartTop">🛒 <span id="cartCount">0</span></button>
+  </header>
+
+  <section class="hero">
+    <h1>Och qoldingizmi? 😋</h1>
+    <p>Bir nechta mahsulotni ham bemalol tanlang.</p>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" data-cat="all">Barchasi</button>
+    <button class="tab" data-cat="burger">🍔 Burger</button>
+    <button class="tab" data-cat="hotdog">🌭 Hot-Dog</button>
+    <button class="tab" data-cat="sandwich">🥪 Sendvich</button>
+  </div>
+
+  <main id="products"></main>
+
+  <section id="checkout" class="checkout hidden">
+    <h2>🛒 Buyurtma</h2>
+    <div id="cart"></div>
+    <div class="total"><span>Jami</span><b id="total">0 so'm</b></div>
+    <input id="name" placeholder="Ismingiz" autocomplete="name">
+    <input id="phone" type="tel" placeholder="+998901234567" autocomplete="tel">
+    <select id="payment"><option value="Karta">💳 Karta</option><option value="Naqd">💵 Naqd</option></select>
+    <textarea id="note" placeholder="Izoh (ixtiyoriy)"></textarea>
+    <button id="send" class="primary">✅ Buyurtmani yuborish</button>
+  </section>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
