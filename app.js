@@ -2,7 +2,7 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-const API_URL = "https://YOUR-RENDER-SERVICE.onrender.com/api/order";
+const API_URL = "https://hotdog-miniapp.onrender.com/api/order";
 
 const MENU = [
   ["classic_burger","Classic Burger",35000,"🍔","burger"],
