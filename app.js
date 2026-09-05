@@ -81,28 +81,46 @@ function openCheckout(){
   $("checkout").scrollIntoView({behavior:"smooth", block:"start"});
   renderCart();
 }
-
 async function sendOrder(){
   const ids = Object.keys(cart);
   if(!ids.length) return alert("Savat bo'sh.");
+
   const name = $("name").value.trim();
   const phone = $("phone").value.trim();
-  if(!name || !phone) return alert("Ism va telefonni kiriting.");
+  const payment = $("payment").value;
+  const receiptFile = $("receipt")?.files?.[0];
+
+  if(!name || !phone){
+    return alert("Ism va telefonni kiriting.");
+  }
+
+  // Karta tanlangan bo'lsa, chek majburiy
+  if(payment === "Karta" && !receiptFile){
+    return alert("❗ Karta orqali to'lov uchun chek rasmini yuklang.");
+  }
 
   const items = ids.map(id => {
     const x = item(id);
-    return {id, name:x[1], qty:cart[id], sum:x[2]*cart[id]};
+    return {
+      id,
+      name:x[1],
+      qty:cart[id],
+      sum:x[2] * cart[id]
+    };
   });
+
+  const receipt = await getReceiptBase64(receiptFile);
 
   const payload = {
     initData: tg.initData,
     user: tg.initDataUnsafe?.user || null,
     name,
     phone,
-    payment: $("payment").value,
+    payment,
     note: $("note").value.trim(),
     items,
-    total: cartTotal()
+    total: cartTotal(),
+    receipt: receipt
   };
 
   const btn = $("send");
@@ -115,27 +133,52 @@ async function sendOrder(){
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify(payload)
     });
+
     const data = await res.json().catch(() => ({}));
-    if(!res.ok || !data.ok) throw new Error(data.error || "Server xatosi");
+
+    if(!res.ok || !data.ok){
+      throw new Error(data.error || "Server xatosi");
+    }
 
     cart = {};
     saveCart();
+
     render();
     renderCart();
+
     $("checkout").classList.add("hidden");
     $("name").value = "";
     $("phone").value = "";
     $("note").value = "";
+
+    if($("receipt")){
+      $("receipt").value = "";
+    }
+
     tg.HapticFeedback?.notificationOccurred("success");
-    tg.showPopup ? tg.showPopup({title:"Buyurtma qabul qilindi", message:"Tez orada siz bilan bog'lanamiz. 🌭", buttons:[{type:"ok"}]}) : alert("Buyurtma qabul qilindi!");
+
+    tg.showPopup
+      ? tg.showPopup({
+          title:"Buyurtma qabul qilindi",
+          message:"Tez orada siz bilan bog'lanamiz. 🌭",
+          buttons:[{type:"ok"}]
+        })
+      : alert("Buyurtma qabul qilindi!");
+
   }catch(err){
     console.error(err);
-    tg.showAlert ? tg.showAlert("Buyurtma yuborilmadi. Server hali ulanmagan yoki xatolik yuz berdi.") : alert("Buyurtma yuborilmadi. Serverni tekshiring.");
+
+    tg.showAlert
+      ? tg.showAlert("Buyurtma yuborilmadi. Server xatosi.")
+      : alert("Buyurtma yuborilmadi. Server xatosi.");
+
   }finally{
     btn.disabled = false;
     btn.textContent = "✅ Buyurtmani yuborish";
   }
 }
+
+
 
 document.querySelectorAll(".tab").forEach(b => b.onclick = () => render(b.dataset.cat));
 $("cartTop").onclick = openCheckout;
