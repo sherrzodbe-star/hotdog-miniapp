@@ -142,3 +142,16 @@ $("cartTop").onclick = openCheckout;
 $("send").onclick = sendOrder;
 render();
 renderCart();
+function copyCard(){
+  const card = "5614682763751841";
+
+  navigator.clipboard.writeText(card).then(() => {
+    tg.showAlert
+      ? tg.showAlert("✅ Karta raqami nusxalandi!")
+      : alert("✅ Karta raqami nusxalandi!");
+  }).catch(() => {
+    tg.showAlert
+      ? tg.showAlert("Karta raqami: " + card)
+      : alert("Karta raqami: " + card);
+  });
+}
