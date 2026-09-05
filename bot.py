@@ -1,3 +1,5 @@
+import base64
+import io
 import asyncio
 import hashlib
 import hmac
@@ -106,6 +108,36 @@ def send_to_telegram(chat_id, text):
         },
         timeout=20
     )
+    def send_receipt_to_telegram(chat_id, receipt):
+    if not receipt:
+        return
+
+    try:
+        header, encoded = receipt.split(",", 1)
+        image_bytes = base64.b64decode(encoded)
+
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+
+        files = {
+            "photo": ("receipt.jpg", io.BytesIO(image_bytes), "image/jpeg")
+        }
+
+        data = {
+            "chat_id": chat_id,
+            "caption": "🧾 To'lov cheki"
+        }
+
+        r = requests.post(
+            url,
+            data=data,
+            files=files,
+            timeout=30
+        )
+
+        r.raise_for_status()
+
+    except Exception:
+        logger.exception("Chekni Telegramga yuborishda xato")
 
     r.raise_for_status()
 
@@ -135,7 +167,7 @@ def create_order():
     payment = str(data.get("payment", "")).strip()
     note = str(data.get("note", "")).strip()
     raw_items = data.get("items", [])
-
+    receipt = data.get("receipt")
     if not name or not phone or not isinstance(raw_items, list) or not raw_items:
         return jsonify(
             ok=False,
@@ -208,7 +240,8 @@ def create_order():
 
         try:
             send_to_telegram(chat_id, text)
-
+if receipt:
+    send_receipt_to_telegram(chat_id, receipt)
         except Exception as e:
             logger.exception("Telegramga yuborishda xato")
             errors.append(str(e))
