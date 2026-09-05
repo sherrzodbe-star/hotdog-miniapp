@@ -35,6 +35,26 @@
     <input id="name" placeholder="Ismingiz" autocomplete="name">
     <input id="phone" type="tel" placeholder="+998901234567" autocomplete="tel">
     <select id="payment"><option value="Karta">💳 Karta</option><option value="Naqd">💵 Naqd</option></select>
+    <div id="cardPayment" class="cardPayment">
+  <h3>💳 Karta orqali to‘lov</h3>
+
+  <p>Karta egasi: <b>Abdurashidov Umid</b></p>
+
+  <div class="cardNumber">
+    <span id="cardNumber">5614 **** **** 1841</span>
+    <button type="button" onclick="copyCard()">📋 Nusxalash</button>
+  </div>
+
+  <p class="paymentInfo">
+    Yuqoridagi karta raqamiga buyurtma summasini o‘tkazing.
+    Keyin to‘lov chekini yuboring.
+  </p>
+
+  <label>🧾 To‘lov cheki</label>
+  <input id="receipt" type="file" accept="image/*">
+
+  <p id="receiptStatus"></p>
+    </div>
     <textarea id="note" placeholder="Izoh (ixtiyoriy)"></textarea>
     <button id="send" class="primary">✅ Buyurtmani yuborish</button>
   </section>
